@@ -1,6 +1,6 @@
 from turtle import forward, left, right, penup, pendown, speed, exitonclick, circle, setposition, color, pensize
 from math import sqrt
-speed(0)
+# speed(0)
 
 # nakreslí hrací pole
 
@@ -34,9 +34,10 @@ def ziskej_kladne_cislo(vyzvani_hrace, dolni_mez):
 
 
 def nacti_parametry_pole():
-    a = ziskej_kladne_cislo("zadej počet řádků", 1)
-    b = ziskej_kladne_cislo("zadej počet sloupců", 1)
-    d = ziskej_kladne_cislo("zadej velikost políčka (aspoň 20, ať to jde vidět)", 20)
+    a = ziskej_kladne_cislo("zadej počet řádků ", 1)
+    b = ziskej_kladne_cislo("zadej počet sloupců ", 1)
+    d = ziskej_kladne_cislo(
+        "zadej velikost políčka (aspoň 20, ať to jde vidět) ", 20)
     return a, b, d
 
 # získá souřadnice na hracím poli a oštří chybné vstupy
@@ -54,14 +55,15 @@ def ziskej_souradnici(vyzvani_hrace, dolni_mez, horni_mez):
 
 
 def ziskej_souradnice(sirka, vyska, hrac):
-    x = ziskej_souradnici(f"Hráči {hrac}, zadej souřadnici x", 1, sirka)
-    y = ziskej_souradnici(f"Hráči {hrac}, zadej souřadnici y", 1, vyska)
+    x = ziskej_souradnici(f"Hráči {hrac}, zadej souřadnici x ", 1, sirka)
+    y = ziskej_souradnici(f"Hráči {hrac}, zadej souřadnici y ", 1, vyska)
     return x, y
 
 
 # nakreslí kolečko
 def kolecko(x, y, velikost_policka):
-    setposition((x-1)*velikost_policka+velikost_policka/2, (y-1)*velikost_policka+velikost_policka/6)
+    setposition((x-1)*velikost_policka+velikost_policka/2,
+                (y-1)*velikost_policka+velikost_policka/6)
     pendown()
     color('blue')
     circle(velikost_policka/3)
@@ -71,7 +73,8 @@ def kolecko(x, y, velikost_policka):
 
 
 def krizek(x, y, velikost_policka):
-    setposition((x-1)*velikost_policka+velikost_policka/6, (y-1)*velikost_policka+velikost_policka/6)
+    setposition((x-1)*velikost_policka+velikost_policka/6,
+                (y-1)*velikost_policka+velikost_policka/6)
     pendown()
     color('red')
     left(45)
@@ -98,6 +101,7 @@ def piskvorky(sirka, vyska, velikost_policka):
         else:
             x, y = ziskej_souradnice(sirka, vyska, 1)
             krizek(x, y, velikost_policka)
+    print("konec hry")
     exitonclick()
 
 
