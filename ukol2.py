@@ -1,70 +1,48 @@
 import csv
-
-
-def vysledny_seznam(zbytek,prumery):
-    for i in range (len(prumery)):
-        zbytek[i].append(prumery[i])
-
-def spocitej_a_pridej_prumer (prutoky,vysledny_seznam_prumeru):
-    prumer = round((sum(prutoky)/len(prutoky)),4)
-    vysledny_seznam_prumeru.append(prumer)
-
-def pridej_prvni_radek_do_seznamu (vysledny_seznam,vstupni_seznam):
-    vysledny_seznam.append(vstupni_seznam[0])
-
-def rozdel_radek_a_pridej_do_seznamu(zbytek,prumery,radek):
-    zbytek.append(radek[0:5])
-    prumery.append(float(radek[5]))
-
-with open(r"vstup.csv", encoding="utf-8") as csvinfile, open(r"vystup_7denni.csv", "w", encoding="utf-8", newline="") as csvoutfile, open(r"vystup_rok.csv", "w", encoding="utf-8", newline="") as csvoutfile_rok:
+with open(r"vstup.csv", encoding="utf-8") as csvinfile, open(r"vystup_7denni.csv", "w", encoding="utf-8", newline="") as csvoutfile_den, open(r"vystup_rok.csv", "w", encoding="utf-8", newline="") as csvoutfile_rok:
     reader = csv.reader(csvinfile, delimiter=",")
-    writer = csv.writer(csvoutfile)
+    writer_den = csv.writer(csvoutfile_den)
     writer_rok = csv.writer(csvoutfile_rok)
-    n=0
-    sedm_prutoku=[] #sem se nacte 7 prutoku z jednoho tydne (krome posledniho tydne)
-    ostatni_udaje=[]
-    seznam_prumeru=[]
-    prutoky_rok=[]
-    seznam_rocnich_prumeru=[]
-    seznam_rocnich_prutoku=[]
-    ostatni_udaje_rok=[]
-    
+    first_date_week = None
+    first_date_year = None
+    days_in_week = 0
+    days_in_year = 0
+    prefix = None
+    prutok_sum_week = 0
+    prutok_sum_year = 0
+
     for row in reader:
-        n+=1
-        rok=int(row[2])
-        sedm_prutoku.append(float(row[5])) 
+        if prefix is None:
+            prefix = row[0:2]
 
-        if n%7==0:
-            spocitej_a_pridej_prumer(sedm_prutoku,seznam_prumeru)
-            sedm_prutoku.clear()
-        
-        if n%7==1:
-            ostatni_udaje.append(row[0:5])
-        
-        if len(prutoky_rok)==0 or rok==int(prutoky_rok[-1][2]):
-            rozdel_radek_a_pridej_do_seznamu(prutoky_rok,seznam_rocnich_prutoku,row)
+        if first_date_week is None:
+            first_date_week = row[2:5]
 
-        else:
-            pridej_prvni_radek_do_seznamu(ostatni_udaje_rok,prutoky_rok)
-            spocitej_a_pridej_prumer(seznam_rocnich_prutoku,seznam_rocnich_prumeru)
-            seznam_rocnich_prutoku.clear()
-            prutoky_rok.clear()
-            rozdel_radek_a_pridej_do_seznamu(prutoky_rok,seznam_rocnich_prutoku,row)
+        if first_date_year is None:
+            first_date_year = row[2:5]
 
-    
+        if days_in_week == 7:
 
-    spocitej_a_pridej_prumer(sedm_prutoku,seznam_prumeru)
+            writer_den.writerow(prefix + first_date_week +
+                                [round(prutok_sum_week/days_in_week, 4)])
+            prutok_sum_week = 0
+            first_date_week = row[2:5]
+            days_in_week = 0
 
-    spocitej_a_pridej_prumer(seznam_rocnich_prutoku,seznam_rocnich_prumeru)
-    pridej_prvni_radek_do_seznamu(ostatni_udaje_rok,prutoky_rok)   
-   
-    
-    
+        if first_date_year[0] != row[2]:
+            writer_rok.writerow(prefix + first_date_year +
+                                [round(prutok_sum_year/days_in_year, 4)])
+            prutok_sum_year = 0
+            first_date_year = row[2:5]
+            days_in_year = 0
 
-    vysledny_seznam(ostatni_udaje,seznam_prumeru)
-    vysledny_seznam(ostatni_udaje_rok,seznam_rocnich_prumeru)
+        days_in_year += 1
+        days_in_week += 1
 
-    writer.writerows(ostatni_udaje)
-    writer_rok.writerows(ostatni_udaje_rok)
+        prutok_sum_week += float(row[5])
+        prutok_sum_year += float(row[5])
 
-        
+    writer_den.writerow(prefix + first_date_week +
+                        [round(prutok_sum_year/days_in_week, 4)])
+    writer_rok.writerow(prefix + first_date_year +
+                        [round(prutok_sum_year/days_in_year, 4)])
